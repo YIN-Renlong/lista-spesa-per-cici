@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista Spesa Famiglia</title>
+    <style>
+        :root {
+            --primary: #2ecc71; /* Verde fresco */
+            --checked: #95a5a6;
+            --bg: #fdfdfd;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        h1 { text-align: center; color: #2c3e50; }
+        .container { max-width: 600px; margin: 0 auto; }
+        
+        /* Stile per la selezione (Moglie) */
+        .category { margin-top: 20px; font-weight: bold; color: #27ae60; border-bottom: 2px solid #eee; padding-bottom: 5px; }
+        .item-selector {
+            display: block;
+            margin: 10px 0;
+            font-size: 18px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .item-selector input { margin-right: 15px; transform: scale(1.5); }
+        
+        /* Stile per la spesa (Marito) */
+        .shopping-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .shopping-item.bought {
+            background-color: #f0f0f0;
+            color: var(--checked);
+            text-decoration: line-through;
+        }
+        .checkbox-circle {
+            width: 24px; height: 24px;
+            border: 2px solid #2ecc71;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .shopping-item.bought .checkbox-circle { background: #2ecc71; }
+
+        /* Bottoni */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #27ae60;
+            color: white;
+            text-align: center;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            margin-top: 20px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-whatsapp { background-color: #25D366; }
+        .hidden { display: none; }
+        
+        /* Area link generato */
+        #generated-link-area {
+            background: #e8f8f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 id="page-title">Cosa serve oggi?</h1>
+
+    <div id="selection-view">
+        <p style="text-align: center; color: #666;">Seleziona i prodotti e crea il link per WhatsApp.</p>
+        <form id="items-form">
+            </form>
+        <button class="btn" onclick="generateLink()">Crea Lista Spesa</button>
+        
+        <div id="generated-link-area" class="hidden">
+            <p><strong>Link creato!</strong> Invialo su WhatsApp:</p>
+            <a id="whatsapp-btn" href="#" class="btn btn-whatsapp">Invia su WhatsApp 📲</a>
+        </div>
+    </div>
+
+    <div id="shopping-view" class="hidden">
+        <div id="shopping-list"></div>
+        <button class="btn" onclick="window.location.href = window.location.pathname">Crea una nuova lista</button>
+    </div>
+</div>
+
+<script>
+    // Database dei prodotti basato sulla tua chat history
+    const products = {
+        "Ortofrutta 🥦": [
+            "Pomodorini", "Insalata", "Carote", "Carciofi", "Zucchine", 
+            "Patate rosse bio", "Cipolle rosse", "Aglio", "Prezzemolo", 
+            "Erba cipollina", "Timo", "Cavolfiore/Broccolo", "Funghi Shiitake", 
+            "Arance", "Clementine", "Limoni bio", "Banane", "Frutta mista"
+        ],
+        "Freschi & Frigo 🧀": [
+            "Latte", "Latte bio", "Uova bio", "Ricotta", "Parmigiano", 
+            "Formaggio Quark", "Scamorza secca", "Burro", "Yogurt"
+        ],
+        "Carne & Pesce 🍗": [
+            "Petto di pollo", "Carne per te", "Vongole", "Pesce fresco (Merluzzo)"
+        ],
+        "Dispensa 🍝": [
+            "Pasta (Spaghetti/Tagliatelle)", "Riso", "Pane", "Olio EVO", "Sale (Grosso/Fino)", 
+            "Pepe nero", "Passata pomodoro", "Ceci (vetro)", "Fagioli", 
+            "Semi misti", "Pistacchi", "Anacardi", "Noci/Mandorle", "Castagne"
+        ],
+        "Dolci & Varie 🍫": [
+            "Cioccolata 100%", "Dolce per te", "Biscotti", "Caffè"
+        ],
+        "Casa 🧻": [
+            "Carta igienica", "Carta cucina", "Detersivi"
+        ]
+    };
+
+    // Logica Principale
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const encodedList = urlParams.get('list');
+
+        if (encodedList) {
+            // MOSTRA LA LISTA DELLA SPESA (Se c'è ?list=... nell'URL)
+            showShoppingMode(encodedList);
+        } else {
+            // MOSTRA LA SELEZIONE (Se l'URL è pulito)
+            showSelectionMode();
+        }
+    });
+
+    function showSelectionMode() {
+        const form = document.getElementById('items-form');
+        
+        for (const [category, items] of Object.entries(products)) {
+            const catHeader = document.createElement('div');
+            catHeader.className = 'category';
+            catHeader.textContent = category;
+            form.appendChild(catHeader);
+
+            items.forEach(item => {
+                const label = document.createElement('label');
+                label.className = 'item-selector';
+                label.innerHTML = `
+                    <input type="checkbox" name="item" value="${item}">
+                    ${item}
+                `;
+                form.appendChild(label);
+            });
+        }
+    }
+
+    function generateLink() {
+        const checkboxes = document.querySelectorAll('input[name="item"]:checked');
+        const selectedItems = Array.from(checkboxes).map(cb => cb.value);
+
+        if (selectedItems.length === 0) {
+            alert("Seleziona almeno un prodotto!");
+            return;
+        }
+
+        // Codifica semplice in Base64 per rendere l'URL più pulito (opzionale, ma consigliato)
+        const listString = selectedItems.join('|');
+        const encoded = encodeURIComponent(listString);
+        
+        const currentUrl = window.location.href.split('?')[0];
+        const finalLink = `${currentUrl}?list=${encoded}`;
+
+        // Prepara il bottone WhatsApp
+        const waText = `Ecco la lista della spesa: ${finalLink}`;
+        const waLink = `https://wa.me/?text=${encodeURIComponent(waText)}`;
+
+        document.getElementById('whatsapp-btn').href = waLink;
+        document.getElementById('generated-link-area').classList.remove('hidden');
+        
+        // Scrolla verso il basso
+        document.getElementById('generated-link-area').scrollIntoView({behavior: "smooth"});
+    }
+
+    function showShoppingMode(encodedList) {
+        document.getElementById('selection-view').classList.add('hidden');
+        document.getElementById('shopping-view').classList.remove('hidden');
+        document.getElementById('page-title').textContent = "Lista Spesa 🛒";
+
+        // Decodifica
+        const listString = decodeURIComponent(encodedList);
+        const items = listString.split('|');
+        const listContainer = document.getElementById('shopping-list');
+
+        items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'shopping-item';
+            div.innerHTML = `<div class="checkbox-circle"></div> ${item}`;
+            
+            // Gestione click per spuntare
+            div.onclick = function() {
+                this.classList.toggle('bought');
+                const circle = this.querySelector('.checkbox-circle');
+                circle.innerHTML = this.classList.contains('bought') ? '✓' : '';
+                circle.style.color = 'white';
+            };
+            
+            listContainer.appendChild(div);
+        });
+    }
+</script>
+
+</body>
+</html>
