@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lista Spesa Famiglia</title>
+    <title>Lista Spesa Cici</title>
     <style>
         :root {
             --primary: #2ecc71;
@@ -15,47 +15,55 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg);
             margin: 0;
-            padding: 20px 20px 100px 20px; /* Padding bottom extra per la barra fissa */
+            padding: 20px 20px 100px 20px;
             color: #333;
             -webkit-tap-highlight-color: transparent;
         }
-        h1 { text-align: center; color: #2c3e50; margin-bottom: 20px; font-size: 1.5rem; }
+        h1 { 
+            text-align: center; 
+            color: #2c3e50; 
+            margin-bottom: 25px; 
+            font-size: 1.6rem; 
+            line-height: 1.4;
+        }
         .container { max-width: 600px; margin: 0 auto; }
         
-        /* Stile selezione (Moglie) */
+        /* Categorie */
         .category { 
-            margin-top: 25px; 
-            font-weight: 700; 
+            margin-top: 30px; 
+            font-weight: 800; 
             color: #27ae60; 
             text-transform: uppercase; 
             letter-spacing: 1px; 
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             border-bottom: 2px solid #eee; 
             padding-bottom: 5px; 
         }
+
+        /* Selettori (Moglie) */
         .item-selector {
             display: flex;
             align-items: center;
             margin: 8px 0;
-            font-size: 18px;
+            font-size: 18px; /* Testo grande */
             padding: 12px;
             background: #fff;
             border: 1px solid var(--border);
             border-radius: 12px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.1s;
         }
-        .item-selector:active { background-color: #f0fdf4; }
-        /* Nascondiamo la checkbox nativa per farne una custom più carina */
+        .item-selector:active { background-color: #f0fdf4; transform: scale(0.99); }
         .item-selector input { display: none; }
         
-        /* Custom Checkbox UI */
+        /* Checkbox Custom */
         .check-indicator {
             width: 24px; height: 24px;
             border: 2px solid #ccc;
             border-radius: 6px;
-            margin-right: 15px;
+            margin-right: 12px;
             display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
             transition: all 0.2s;
         }
         .item-selector input:checked + .check-indicator {
@@ -64,29 +72,34 @@
             color: white;
         }
         .item-selector input:checked + .check-indicator::after {
-            content: '✓'; font-weight: bold;
+            content: '✓'; font-weight: bold; font-size: 14px;
         }
 
-        /* Stile Lista Spesa (Marito) */
+        /* Lista Spesa (Marito) */
         .shopping-item {
             display: flex;
             align-items: center;
-            padding: 15px;
+            padding: 16px;
             margin: 10px 0;
             background: white;
             border-radius: 12px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            font-size: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            font-size: 19px; /* Ancora più leggibile per la spesa */
             cursor: pointer;
+            border: 1px solid transparent;
         }
         .shopping-item.bought {
             background-color: #f5f5f5;
             color: var(--checked);
             text-decoration: line-through;
-            opacity: 0.8;
+            opacity: 0.7;
+            box-shadow: none;
+            border: 1px solid #eee;
         }
+        .shopping-item.bought .item-text { filter: grayscale(100%); }
+        
         .circle {
-            width: 24px; height: 24px;
+            width: 26px; height: 26px;
             border: 2px solid var(--primary);
             border-radius: 50%;
             margin-right: 15px;
@@ -94,50 +107,50 @@
         }
         .shopping-item.bought .circle { background: var(--primary); }
 
-        /* BARRA FISSA IN BASSO (Moglie) */
+        /* Barra in basso */
         .bottom-bar {
             position: fixed;
             bottom: 0; left: 0; right: 0;
-            background: white;
-            padding: 15px 20px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px 25px 20px; /* Più spazio per iPhone moderni */
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.08);
             display: flex;
             flex-direction: column;
             gap: 10px;
             z-index: 100;
+            border-top: 1px solid #eee;
         }
         .counter-text {
-            text-align: center; font-size: 0.9rem; color: #666; margin-bottom: 5px;
+            text-align: center; font-size: 0.9rem; color: #666; margin-bottom: 5px; font-weight: 500;
         }
-        .action-buttons {
-            display: flex; gap: 10px;
-        }
+        .action-buttons { display: flex; gap: 10px; }
         .btn {
             flex: 1;
             padding: 14px;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             text-align: center;
             text-decoration: none;
             color: white;
             transition: transform 0.1s;
         }
-        .btn:active { transform: scale(0.98); }
+        .btn:active { transform: scale(0.96); }
         .btn-copy { background-color: #34495e; }
         .btn-whatsapp { background-color: #25D366; }
-        .btn-reset { background-color: #e74c3c; margin-top: 10px; }
+        .btn-reset { background-color: #ff6b6b; margin-top: 15px; box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3); }
 
         .hidden { display: none !important; }
         
-        /* Toast Notification */
         #toast {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.8); color: white; padding: 10px 20px;
-            border-radius: 20px; opacity: 0; transition: opacity 0.3s;
-            pointer-events: none; z-index: 200;
+            background: rgba(0,0,0,0.85); color: white; padding: 12px 24px;
+            border-radius: 30px; opacity: 0; transition: opacity 0.3s;
+            pointer-events: none; z-index: 200; font-weight: 500;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
     </style>
 </head>
@@ -152,54 +165,72 @@
         <form id="items-form">
             </form>
         
-        <div style="height: 100px;"></div>
+        <div style="height: 120px;"></div>
 
         <div class="bottom-bar" id="actions-bar">
-            <div class="counter-text" id="counter">0 prodotti selezionati</div>
+            <div class="counter-text" id="counter">Nessun prodotto selezionato</div>
             <div class="action-buttons">
                 <button class="btn btn-copy" onclick="copyLink()">Copia Link 📋</button>
-                <a id="whatsapp-btn" href="#" class="btn btn-whatsapp">WhatsApp 📲</a>
+                <a id="whatsapp-btn" href="#" class="btn btn-whatsapp">WhatsApp 💚</a>
             </div>
         </div>
     </div>
 
     <div id="shopping-view" class="hidden">
         <div id="shopping-list"></div>
-        <button class="btn btn-reset" onclick="window.location.href = window.location.pathname">Nuova Lista</button>
+        <button class="btn btn-reset" onclick="window.location.href = window.location.pathname">Nuova Lista ✨</button>
+        <div style="height: 50px;"></div>
     </div>
 </div>
 
 <script>
-    // LISTA PRODOTTI AGGIORNATA
+    // --- 1. TITOLO CASUALE PER CICI ---
+    // Le tue emoji preferite
+    const ciciEmojis = ["🌙","☀️","☺️","😊","👍","👙","🫵","⭐️","👀","🧜‍♂️","👹","😈","🌝","👆","😴","🧜‍♂️","👺","👞","🌟","🦨"];
+    
+    function setRandomTitle() {
+        const randomEmoji = ciciEmojis[Math.floor(Math.random() * ciciEmojis.length)];
+        const titleElement = document.getElementById('page-title');
+        // Impostiamo il titolo solo se siamo in modalità selezione (non nel link della spesa)
+        if (!window.location.search.includes('list=')) {
+            titleElement.textContent = `Cosa serve oggi la Cici? ${randomEmoji}`;
+        }
+    }
+
+    // --- 2. LISTA PRODOTTI CON EMOJI ---
     const products = {
         "Ortofrutta 🥦": [
-            "Pomodorini", "Insalata", "Carote", "Carciofi", "Zucchine", "Patate rosse bio", 
-            "Cipolle rosse", "Aglio", "Prezzemolo", "Erba cipollina", "Timo", "Verdure miste",
-            "Cavolfiore/Broccolo", "Funghi Shiitake", "Arance", "Clementine", "Limoni bio", "Banane", "Frutta mista"
+            "🍅 Pomodorini", "🥗 Insalata", "🥕 Carote", "🥬 Carciofi", "🥒 Zucchine", 
+            "🥔 Patate rosse bio", "🧅 Cipolle rosse", "🧄 Aglio", "🌿 Prezzemolo", 
+            "🌱 Erba cipollina", "🌿 Timo", "🥦 Cavolfiore/Broccolo", "🍄 Funghi Shiitake", 
+            "🍊 Arance", "🍊 Clementine", "🍋 Limoni bio", "🍌 Banane", "🍎 Frutta mista"
         ],
         "Freschi & Frigo 🧀": [
-            "Latte", "Latte bio", "Uova bio", "Ricotta", "Parmigiano", 
-            "Formaggio Quark", "Scamorza secca", "Burro", "Yogurt"
+            "🥛 Latte", "🥛 Latte bio", "🥚 Uova bio", "🥣 Ricotta", "🧀 Parmigiano", 
+            "🥛 Formaggio Quark", "🧀 Scamorza secca", "🧈 Burro", "🍦 Yogurt"
         ],
         "Carne & Pesce 🍗": [
-            "Petto di pollo", "Carne per te", "Vongole", "Pesce fresco", "Merluzzo"
+            "🐔 Petto di pollo", "🥩 Carne per te", "🐚 Vongole", "🐟 Pesce fresco", "🐟 Merluzzo"
         ],
         "Dispensa 🍝": [
-            "Pasta", "Spaghetti", "Tagliatelle", "Riso", "Pane", "Olio EVO", "Sale Grosso", "Sale Fino", 
-            "Pepe nero", "Passata pomodoro", "Ceci (vetro)", "Fagioli", 
-            "Semi misti", "Pistacchi", "Anacardi", "Noci/Mandorle", "Castagne"
+            "🍝 Pasta", "🍝 Spaghetti", "🍜 Tagliatelle", "🍚 Riso", "🥖 Pane", 
+            "🫒 Olio EVO", "🧂 Sale Grosso", "🧂 Sale Fino", "⚫️ Pepe nero", 
+            "🥫 Passata pomodoro", "🫙 Ceci (vetro)", "🫘 Fagioli", 
+            "🌻 Semi misti", "🥜 Pistacchi", "🥜 Anacardi", "🌰 Noci/Mandorle", "🌰 Castagne"
         ],
         "Dolci & Colazione 🍫": [
-            "Cioccolata 100%", "Dolce per te", "Biscotti", "Caffè"
+            "🍫 Cioccolata 100%", "🍰 Dolce per te", "🍪 Biscotti", "☕️ Caffè"
         ],
         "Casa 🧻": [
-            "Carta igienica", "Carta cucina", "Detersivi"
+            "🧻 Carta igienica", "🧻 Carta cucina", "🧼 Detersivi"
         ]
     };
 
     let currentSelection = [];
 
     document.addEventListener('DOMContentLoaded', () => {
+        setRandomTitle(); // Imposta il titolo casuale all'avvio
+
         const urlParams = new URLSearchParams(window.location.search);
         const encodedList = urlParams.get('list');
 
@@ -230,27 +261,24 @@
                 form.appendChild(label);
             });
         }
-        updateLinks(); // Init stato iniziale
+        updateLinks();
     }
 
     function updateLinks() {
-        // 1. Raccogli items
         const checkboxes = document.querySelectorAll('input[name="item"]:checked');
         currentSelection = Array.from(checkboxes).map(cb => cb.value);
 
-        // 2. Aggiorna contatore UI
         const count = currentSelection.length;
         document.getElementById('counter').textContent = 
-            count === 0 ? "Seleziona i prodotti..." : `${count} prodotti selezionati`;
+            count === 0 ? "Scegli i prodotti..." : `${count} prodotti selezionati`;
 
-        // 3. Genera Link
         const baseUrl = window.location.href.split('?')[0];
+        // Encoding gestisce le emoji automaticamente nel link
         const listString = currentSelection.join('|');
         const encoded = encodeURIComponent(listString);
         const fullLink = `${baseUrl}?list=${encoded}`;
 
-        // 4. Aggiorna bottone WhatsApp in tempo reale
-        const waText = `Lista spesa: ${fullLink}`;
+        const waText = `Lista spesa Cici: ${fullLink}`;
         const waLink = `https://wa.me/?text=${encodeURIComponent(waText)}`;
         
         const waBtn = document.getElementById('whatsapp-btn');
@@ -264,7 +292,7 @@
             waBtn.style.pointerEvents = "none";
         }
 
-        return fullLink; // Ritorniamo il link per la funzione copia
+        return fullLink;
     }
 
     async function copyLink() {
@@ -273,9 +301,8 @@
 
         try {
             await navigator.clipboard.writeText(link);
-            showToast("Link copiato negli appunti!");
+            showToast("Link copiato!");
         } catch (err) {
-            // Fallback per vecchi browser o contesti non sicuri
             const textArea = document.createElement("textarea");
             textArea.value = link;
             document.body.appendChild(textArea);
@@ -296,10 +323,11 @@
     function showShoppingMode(encodedList) {
         document.getElementById('selection-view').classList.add('hidden');
         document.getElementById('shopping-view').classList.remove('hidden');
+        
+        // Titolo statico per chi fa la spesa, o personalizzato se preferisci
         document.getElementById('page-title').textContent = "Lista Spesa 🛒";
 
         const listString = decodeURIComponent(encodedList);
-        // Gestione caso lista vuota o errore
         if(!listString) return;
         
         const items = listString.split('|');
@@ -308,10 +336,13 @@
         items.forEach(item => {
             const div = document.createElement('div');
             div.className = 'shopping-item';
-            div.innerHTML = `<div class="circle"></div> ${item}`;
+            // L'item contiene già l'emoji, quindi la visualizziamo direttamente
+            div.innerHTML = `<div class="circle"></div> <span class="item-text">${item}</span>`;
             
             div.onclick = function() {
                 this.classList.toggle('bought');
+                // Vibrazione leggera su mobile quando spunti (se supportato)
+                if (navigator.vibrate) navigator.vibrate(10);
             };
             listContainer.appendChild(div);
         });
