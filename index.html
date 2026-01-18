@@ -204,13 +204,13 @@
 
     <div id="selection-view">
         <div class="clear-btn-container">
-            <button class="btn-clear" onclick="clearSelection()">🗑 Svuota / Leegmaken</button>
+            <button class="btn-clear" onclick="clearSelection()">🗑 Svuota</button>
         </div>
 
         <form id="items-form">
             </form>
 
-        <div class="category">Altro / Overige</div>
+        <div class="category">Altro</div>
         <div id="custom-items-list"></div> 
         <div class="add-item-container">
             <input type="text" id="custom-input" placeholder="Scrivi qui / Typ hier..." enterkeyhint="done">
@@ -219,9 +219,9 @@
         
         <div style="height: 140px;"></div> 
         <div class="bottom-bar" id="actions-bar">
-            <div class="counter-text" id="counter">Nessun prodotto / Geen producten</div>
+            <div class="counter-text" id="counter">Nessun prodotto</div>
             <div class="action-buttons">
-                <button class="btn btn-copy" onclick="copyLink()">Link 📋</button>
+                <button class="btn btn-copy" onclick="copyLink()">Copia Link 📋</button>
                 <a id="whatsapp-btn" href="#" class="btn btn-whatsapp">WhatsApp 💚</a>
             </div>
         </div>
@@ -242,7 +242,7 @@
         const randomEmoji = ciciEmojis[Math.floor(Math.random() * ciciEmojis.length)];
         const titleElement = document.getElementById('page-title');
         if (!window.location.search.includes('list=')) {
-            titleElement.textContent = `Cosa serve alla Cici? / Wat moet Cici hebben? ${randomEmoji}`;
+            titleElement.textContent = `Cosa serve alla Cici? ${randomEmoji}`;
         }
     }
 
