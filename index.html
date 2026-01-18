@@ -284,7 +284,6 @@
     };
 
     let currentSelection = [];
-    // Nome della "chiave" dove salviamo i dati nel telefono
     const STORAGE_KEY = "cici_shopping_draft_v1";
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -293,7 +292,6 @@
         const urlParams = new URLSearchParams(window.location.search);
         const encodedList = urlParams.get('list');
 
-        // Gestione tasto INVIO nella casella di testo
         document.getElementById('custom-input').addEventListener("keypress", function(event) {
             if (event.key === "Enter") {
                 event.preventDefault();
@@ -302,12 +300,12 @@
         });
 
         if (encodedList) {
-            // Se c'è un link (modalità marito), non carichiamo la bozza
+            // Modalità Spesa (Marito)
             showShoppingMode(encodedList);
         } else {
-            // Se siamo in selezione (modalità moglie), carichiamo i checkbox
+            // Modalità Selezione (Moglie)
             initSelectionMode();
-            loadDraft(); // <-- Carica i dati salvati
+            loadDraft();
         }
     });
 
@@ -333,34 +331,25 @@
         }
     }
 
-    // --- NUOVE FUNZIONI PER SALVATAGGIO ---
-
     function loadDraft() {
         const savedData = localStorage.getItem(STORAGE_KEY);
         if (!savedData) {
-            updateLinks(); // Aggiorna UI vuota
+            updateLinks();
             return;
         }
 
         try {
             const savedItems = JSON.parse(savedData);
-            
-            // Per ogni elemento salvato
             savedItems.forEach(val => {
-                // Cerca se esiste una checkbox standard con questo valore
                 const checkbox = document.querySelector(`input[name="item"][value="${val}"]`);
-                
                 if (checkbox) {
-                    // Se esiste (prodotto standard), la spuntiamo
                     checkbox.checked = true;
                 } else {
-                    // Se non esiste, vuol dire che era un prodotto personalizzato
-                    // Lo ricreiamo rimuovendo l'emoji ✨ se presente per evitare doppi
                     let cleanText = val.replace('✨ ', ''); 
-                    addCustomItem(cleanText, true); // true = è un restore
+                    addCustomItem(cleanText, true);
                 }
             });
-            updateLinks(); // Aggiorna contatori
+            updateLinks();
         } catch (e) {
             console.error("Errore nel caricamento lista", e);
         }
@@ -368,18 +357,12 @@
 
     function clearSelection() {
         if(!confirm("Vuoi cancellare tutte le spunte selezionate?")) return;
-        
-        // Deseleziona tutto visivamente
         document.querySelectorAll('input[name="item"]').forEach(el => el.checked = false);
-        // Rimuove i custom items visivamente
         document.getElementById('custom-items-list').innerHTML = '';
-        
-        // Pulisce la memoria
         localStorage.removeItem(STORAGE_KEY);
         updateLinks();
     }
 
-    // --- MODIFICATA PER GESTIRE PARAMETRI ---
     function addCustomItem(textToRestore = null, isRestore = false) {
         let value;
         const input = document.getElementById('custom-input');
@@ -394,9 +377,6 @@
 
         const container = document.getElementById('custom-items-list');
         const label = document.createElement('label');
-        
-        // Se stiamo ripristinando, il valore ha già l'emoji se lo prendiamo dal valore checkbox,
-        // ma qui textToRestore è pulito. Aggiungiamo sempre l'emoji se non c'è.
         const itemValue = value.startsWith('✨') ? value : "✨ " + value;
 
         label.className = 'item-selector';
@@ -409,9 +389,9 @@
         container.appendChild(label);
         
         if (!textToRestore) {
-            input.value = ""; // Pulisci campo solo se inserimento manuale
+            input.value = "";
             label.scrollIntoView({behavior: "smooth", block: "center"});
-            updateLinks(); // Aggiorna e salva
+            updateLinks();
         }
     }
 
@@ -419,10 +399,7 @@
         const checkboxes = document.querySelectorAll('input[name="item"]:checked');
         currentSelection = Array.from(checkboxes).map(cb => cb.value);
 
-        // --- SALVARE LO STATO ---
-        // Salviamo l'array currentSelection nel browser
         localStorage.setItem(STORAGE_KEY, JSON.stringify(currentSelection));
-        // ------------------------
 
         const count = currentSelection.length;
         document.getElementById('counter').textContent = 
@@ -481,6 +458,7 @@
         setTimeout(() => { t.style.opacity = '0'; }, 2000);
     }
 
+    // --- FUNZIONE MODIFICATA PER CATEGORIE ---
     function showShoppingMode(encodedList) {
         document.getElementById('selection-view').classList.add('hidden');
         document.getElementById('shopping-view').classList.remove('hidden');
@@ -493,17 +471,69 @@
         const items = listString.split('|');
         const listContainer = document.getElementById('shopping-list');
 
+        // 1. Organizziamo gli items per categoria
+        let categorizedItems = {};
+        let otherItems = [];
+
         items.forEach(item => {
+            let found = false;
+            // Cerca in quale categoria si trova l'item
+            for (const [catName, productsList] of Object.entries(products)) {
+                if (productsList.includes(item)) {
+                    if (!categorizedItems[catName]) {
+                        categorizedItems[catName] = [];
+                    }
+                    categorizedItems[catName].push(item);
+                    found = true;
+                    break;
+                }
+            }
+            // Se non trovato (es: aggiunto a mano), va in "Altro"
+            if (!found) {
+                otherItems.push(item);
+            }
+        });
+
+        // 2. Funzione helper per renderizzare un singolo item
+        const renderItem = (text, container) => {
             const div = document.createElement('div');
             div.className = 'shopping-item';
-            div.innerHTML = `<div class="circle"></div> <span class="item-text">${item}</span>`;
+            div.innerHTML = `<div class="circle"></div> <span class="item-text">${text}</span>`;
             
             div.onclick = function() {
                 this.classList.toggle('bought');
                 if (navigator.vibrate) navigator.vibrate(10);
             };
-            listContainer.appendChild(div);
-        });
+            container.appendChild(div);
+        };
+
+        // 3. Renderizza seguendo l'ordine delle chiavi dell'oggetto 'products'
+        for (const catName of Object.keys(products)) {
+            if (categorizedItems[catName] && categorizedItems[catName].length > 0) {
+                // Aggiungi Titolo Categoria
+                const catHeader = document.createElement('div');
+                catHeader.className = 'category';
+                catHeader.textContent = catName;
+                listContainer.appendChild(catHeader);
+
+                // Aggiungi gli items di questa categoria
+                categorizedItems[catName].forEach(item => {
+                    renderItem(item, listContainer);
+                });
+            }
+        }
+
+        // 4. Renderizza gli items "Altro / Extra" alla fine
+        if (otherItems.length > 0) {
+            const catHeader = document.createElement('div');
+            catHeader.className = 'category';
+            catHeader.textContent = "Altro / Extra ✨";
+            listContainer.appendChild(catHeader);
+
+            otherItems.forEach(item => {
+                renderItem(item, listContainer);
+            });
+        }
     }
 </script>
 
