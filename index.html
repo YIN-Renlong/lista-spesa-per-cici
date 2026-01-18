@@ -227,32 +227,77 @@
         }
     }
 
-    // --- 2. LISTA PRODOTTI CON EMOJI ---
+    // --- 2. LISTA PRODOTTI RIORDINATA CON EMOJI ---
     const products = {
         "Ortofrutta 🥦": [
-            "🍅 Pomodorini", "🥗 Insalata", "🥕 Carote", "🥬 Carciofi", "🥒 Zucchine", 
-            "🥔 Patate rosse bio", "🧅 Cipolle rosse", "🧄 Aglio", "🌿 Prezzemolo", 
-            "🌱 Erba cipollina", "🌿 Timo", "🥦 Cavolfiore/Broccolo", "🍄 Funghi Shiitake", 
-            "🍊 Arance", "🍊 Clementine", "🍋 Limoni bio", "🍌 Banane", "🍎 Frutta mista"
+            "🧄 Aglio", 
+            "🍊 Arance", 
+            "🍌 Banane", 
+            "🥬 Carciofi", 
+            "🥕 Carote", 
+            "🥦 Cavolfiore/Broccolo", 
+            "🧅 Cipolle rosse", 
+            "🍊 Clementine", 
+            "🌱 Erba cipollina", 
+            "🍎 Frutta mista", 
+            "🍄 Funghi Shiitake", 
+            "🥗 Insalata", 
+            "🍋 Limoni bio", 
+            "🥔 Patate rosse bio", 
+            "🍅 Pomodorini", 
+            "🌿 Prezzemolo", 
+            "🌿 Timo", 
+            "🥒 Zucchine"
         ],
         "Freschi & Frigo 🧀": [
-            "🥛 Latte", "🥛 Latte bio", "🥚 Uova bio", "🥣 Ricotta", "🧀 Parmigiano", 
-            "🥛 Formaggio Quark", "🧀 Scamorza secca", "🧈 Burro", "🍦 Yogurt"
+            "🧈 Burro", 
+            "🧀 Formaggio Quark", 
+            "🥛 Latte", 
+            "🥛 Latte bio", 
+            "🧀 Parmigiano", 
+            "🥣 Ricotta", 
+            "🧀 Scamorza secca", 
+            "🥚 Uova bio", 
+            "🍦 Yogurt"
         ],
         "Carne & Pesce 🍗": [
-            "🐔 Petto di pollo", "🥩 Carne per te", "🐚 Vongole", "🐟 Pesce fresco", "🐟 Merluzzo"
+            "🥩 Carne per te", 
+            "🐟 Merluzzo", 
+            "🐟 Pesce fresco", 
+            "🐔 Petto di pollo", 
+            "🐚 Vongole"
         ],
         "Dispensa 🍝": [
-            "🍝 Pasta", "🍝 Spaghetti", "🍜 Tagliatelle", "🍚 Riso", "🥖 Pane", 
-            "🫒 Olio EVO", "🧂 Sale Grosso", "🧂 Sale Fino", "⚫️ Pepe nero", 
-            "🥫 Passata pomodoro", "🫙 Ceci (vetro)", "🫘 Fagioli", 
-            "🌻 Semi misti", "🥜 Pistacchi", "🥜 Anacardi", "🌰 Noci/Mandorle", "🌰 Castagne"
+            // Qui mantengo l'ordine LOGICO (più comodo per cucinare)
+            "🍝 Pasta", 
+            "🍝 Spaghetti", 
+            "🍜 Tagliatelle", 
+            "🍚 Riso", 
+            "🥖 Pane", 
+            "🥫 Passata pomodoro", 
+            "🫒 Olio EVO", 
+            "🧂 Sale Grosso", 
+            "🧂 Sale Fino", 
+            "⚫️ Pepe nero", 
+            "🫙 Ceci (vetro)", 
+            "🫘 Fagioli", 
+            // Frutta secca raggruppata
+            "🥜 Anacardi", 
+            "🌰 Castagne", 
+            "🌰 Noci/Mandorle", 
+            "🥜 Pistacchi", 
+            "🌻 Semi misti"
         ],
         "Dolci & Colazione 🍫": [
-            "🍫 Cioccolata 100%", "🍰 Dolce per te", "🍪 Biscotti", "☕️ Caffè"
+            "🍪 Biscotti", 
+            "☕️ Caffè", 
+            "🍫 Cioccolata 100%", 
+            "🍰 Dolce per te"
         ],
         "Casa 🧻": [
-            "🧻 Carta igienica", "🧻 Carta cucina", "🧼 Detersivi"
+            "🧻 Carta cucina", 
+            "🧻 Carta igienica", 
+            "🧼 Detersivi"
         ]
     };
 
