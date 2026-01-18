@@ -45,7 +45,7 @@
             display: flex;
             align-items: center;
             margin: 8px 0;
-            font-size: 18px; /* Testo grande */
+            font-size: 18px;
             padding: 12px;
             background: #fff;
             border: 1px solid var(--border);
@@ -73,6 +73,33 @@
         }
         .item-selector input:checked + .check-indicator::after {
             content: '✓'; font-weight: bold; font-size: 14px;
+        }
+
+        /* STILE PER AGGIUNTA MANUALE */
+        .add-item-container {
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+        }
+        #custom-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        #custom-input:focus { border-color: var(--primary); }
+        #add-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 50px;
+            border-radius: 12px;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
         }
 
         /* Lista Spesa (Marito) */
@@ -107,13 +134,12 @@
         }
         .shopping-item.bought .circle { background: var(--primary); }
 
-        /* Barra in basso */
         .bottom-bar {
             position: fixed;
             bottom: 0; left: 0; right: 0;
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(10px);
-            padding: 15px 20px 25px 20px; /* Più spazio per iPhone moderni */
+            padding: 15px 20px 25px 20px;
             box-shadow: 0 -5px 20px rgba(0,0,0,0.08);
             display: flex;
             flex-direction: column;
@@ -164,10 +190,14 @@
     <div id="selection-view">
         <form id="items-form">
             </form>
-        
-        <div style="height: 120px;"></div>
 
-        <div class="bottom-bar" id="actions-bar">
+        <div class="category">Altro / Mancanti</div>
+        <div id="custom-items-list"></div> <div class="add-item-container">
+            <input type="text" id="custom-input" placeholder="Scrivi qui cosa manca..." enterkeyhint="done">
+            <button id="add-btn" onclick="addCustomItem()">＋</button>
+        </div>
+        
+        <div style="height: 140px;"></div> <div class="bottom-bar" id="actions-bar">
             <div class="counter-text" id="counter">Nessun prodotto selezionato</div>
             <div class="action-buttons">
                 <button class="btn btn-copy" onclick="copyLink()">Copia Link 📋</button>
@@ -234,6 +264,14 @@
         const urlParams = new URLSearchParams(window.location.search);
         const encodedList = urlParams.get('list');
 
+        // Gestione tasto INVIO nella casella di testo
+        document.getElementById('custom-input').addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                addCustomItem();
+            }
+        });
+
         if (encodedList) {
             showShoppingMode(encodedList);
         } else {
@@ -262,6 +300,36 @@
             });
         }
         updateLinks();
+    }
+
+    // --- FUNZIONE AGGIUNTA MANUALE ---
+    function addCustomItem() {
+        const input = document.getElementById('custom-input');
+        const value = input.value.trim();
+        
+        if (!value) return;
+
+        const container = document.getElementById('custom-items-list');
+        const label = document.createElement('label');
+        
+        // Aggiungiamo un'emoji sparkle automatica per i custom items
+        const itemValue = "✨ " + value;
+
+        label.className = 'item-selector';
+        // Creiamo la checkbox già spuntata (checked)
+        label.innerHTML = `
+            <input type="checkbox" name="item" value="${itemValue}" checked onchange="updateLinks()">
+            <div class="check-indicator"></div>
+            ${itemValue}
+        `;
+        
+        container.appendChild(label);
+        input.value = ""; // Pulisci campo
+        
+        // Scrolla leggermente per mostrare l'elemento aggiunto
+        label.scrollIntoView({behavior: "smooth", block: "center"});
+        
+        updateLinks(); // Aggiorna il link subito
     }
 
     function updateLinks() {
