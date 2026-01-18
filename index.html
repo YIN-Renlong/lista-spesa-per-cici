@@ -22,7 +22,7 @@
         h1 { 
             text-align: center; 
             color: #2c3e50; 
-            margin-bottom: 25px; 
+            margin-bottom: 10px; 
             font-size: 1.6rem; 
             line-height: 1.4;
         }
@@ -100,6 +100,21 @@
             font-size: 24px;
             cursor: pointer;
             display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Tasto Svuota */
+        .clear-btn-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .btn-clear {
+            background: none;
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
         }
 
         /* Lista Spesa (Marito) */
@@ -188,16 +203,22 @@
     <h1 id="page-title">Cosa serve oggi?</h1>
 
     <div id="selection-view">
+        <div class="clear-btn-container">
+            <button class="btn-clear" onclick="clearSelection()">🗑 Svuota tutto</button>
+        </div>
+
         <form id="items-form">
             </form>
 
         <div class="category">Altro / Mancanti</div>
-        <div id="custom-items-list"></div> <div class="add-item-container">
+        <div id="custom-items-list"></div> 
+        <div class="add-item-container">
             <input type="text" id="custom-input" placeholder="Scrivi qui cosa manca..." enterkeyhint="done">
             <button id="add-btn" onclick="addCustomItem()">＋</button>
         </div>
         
-        <div style="height: 140px;"></div> <div class="bottom-bar" id="actions-bar">
+        <div style="height: 140px;"></div> 
+        <div class="bottom-bar" id="actions-bar">
             <div class="counter-text" id="counter">Nessun prodotto selezionato</div>
             <div class="action-buttons">
                 <button class="btn btn-copy" onclick="copyLink()">Copia Link 📋</button>
@@ -215,105 +236,59 @@
 
 <script>
     // --- 1. TITOLO CASUALE PER CICI ---
-    // Le tue emoji preferite
     const ciciEmojis = ["🌙","☀️","☺️","😊","👍","👙","🫵","⭐️","👀","🧜‍♂️","👹","😈","🌝","👆","😴","🧜‍♂️","👺","👞","🌟","🦨"];
     
     function setRandomTitle() {
         const randomEmoji = ciciEmojis[Math.floor(Math.random() * ciciEmojis.length)];
         const titleElement = document.getElementById('page-title');
-        // Impostiamo il titolo solo se siamo in modalità selezione (non nel link della spesa)
         if (!window.location.search.includes('list=')) {
             titleElement.textContent = `Cosa serve oggi la Cici? ${randomEmoji}`;
         }
     }
 
-    // --- 2. LISTA PRODOTTI RIORDINATA CON EMOJI ---
+    // --- 2. LISTA PRODOTTI ---
     const products = {
         "Verdura & Odori 🥦": [
-            "🧄 Aglio",
-            "🥬 Carciofi",
-            "🥕 Carote",
-            "🥦 Cavolfiore/Broccolo",
-            "🧅 Cipolle rosse",
-            "🌱 Erba cipollina",
-            "🍄 Funghi Shiitake",
-            "🥗 Insalata",
-            "🥔 Patate rosse bio",
-            "🍅 Pomodorini",
-            "🌿 Prezzemolo",
-            "🌿 Timo",
-            "🥒 Zucchine"
+            "🧄 Aglio", "🥬 Carciofi", "🥕 Carote", "🥦 Cavolfiore/Broccolo", 
+            "🧅 Cipolle rosse", "🌱 Erba cipollina", "🍄 Funghi Shiitake", 
+            "🥗 Insalata", "🥔 Patate rosse bio", "🍅 Pomodorini", 
+            "🌿 Prezzemolo", "🌿 Timo", "🥒 Zucchine"
         ],
         "Frutta 🍎": [
-            "🍊 Arance",
-            "🍌 Banane",
-            "🍊 Clementine",
-            "🍎 Frutta mista",
-            "🍋 Limoni bio"
+            "🍊 Arance", "🍌 Banane", "🍊 Clementine", "🍎 Frutta mista", "🍋 Limoni bio"
         ],
         "Freschi, Frigo & Pane 🧀": [
-            "🧈 Burro",
-            "🧀 Formaggio Quark",
-            "🥛 Latte bio",
-            "🥖 Pane Fresco",
-            "🧀 Parmigiano",
-            "🥣 Ricotta",
-            "🧀 Scamorza secca",
-            "🥚 Uova bio",
-            "🍦 Yogurt"
+            "🧈 Burro", "🧀 Formaggio Quark", "🥛 Latte bio", "🥖 Pane Fresco", 
+            "🧀 Parmigiano", "🥣 Ricotta", "🧀 Scamorza secca", "🥚 Uova bio", "🍦 Yogurt"
         ],
         "Macelleria & Pescheria 🍗": [
-            "🥩 Bistecca",
-            "🥩 Girello",
-            "🥩 Macinato",
-            "🐟 Merluzzo",
-            "🐟 Pesce fresco",
-            "🐔 Petto di pollo",
-            "🐚 Vongole"
+            "🥩 Bistecca", "🥩 Girello", "🥩 Macinato", "🐟 Merluzzo", 
+            "🐟 Pesce fresco", "🐔 Petto di pollo", "🐚 Vongole"
         ],
         "Pasta & Riso (Primi) 🍝": [
-            "🍝 Lasagne",
-            "🍝 Pasta corta",
-            "🍲 Pastina",
-            "🍚 Riso",
-            "🍝 Spaghetti",
-            "🍜 Tagliatelle"
+            "🍝 Lasagne", "🍝 Pasta corta", "🍲 Pastina", "🍚 Riso", "🍝 Spaghetti", "🍜 Tagliatelle"
         ],
         "Legumi & Frutta Secca 🥜": [
-            "🥜 Anacardi",
-            "🌰 Castagne",
-            "🫙 Ceci (vetro)",
-            "🫘 Fagioli (vetro)",
-            "🌰 Mandorle",
-            "🌰 Noci",
-            "🥜 Pistacchi",
-            "🌻 Semi misti"
+            "🥜 Anacardi", "🌰 Castagne", "🫙 Ceci (vetro)", "🫘 Fagioli (vetro)", 
+            "🌰 Mandorle", "🌰 Noci", "🥜 Pistacchi", "🌻 Semi misti"
         ],
         "Dispensa & Condimenti 🥫": [
-            "🫒 Olio Bio",
-            "🥫 Passata pomodoro",
-            "⚫️ Pepe nero",
-            "🧂 Sale Fino",
-            "🧂 Sale Grosso",
-            "🍷 Vino"
+            "🫒 Olio Bio", "🥫 Passata pomodoro", "⚫️ Pepe nero", "🧂 Sale Fino", "🧂 Sale Grosso", "🍷 Vino"
         ],
         "Dolci & Colazione 🍫": [
-            "🍪 Biscotti",
-            "☕️ Caffè",
-            "🍫 Cioccolata 100%",
-            "🍰 Dolce per te"
+            "🍪 Biscotti", "☕️ Caffè", "🍫 Cioccolata 100%", "🍰 Dolce per te"
         ],
         "Casa 🧻": [
-            "🧻 Carta cucina",
-            "🧻 Carta igienica",
-            "🧼 Detersivi"
+            "🧻 Carta cucina", "🧻 Carta igienica", "🧼 Detersivi"
         ]
     };
 
     let currentSelection = [];
+    // Nome della "chiave" dove salviamo i dati nel telefono
+    const STORAGE_KEY = "cici_shopping_draft_v1";
 
     document.addEventListener('DOMContentLoaded', () => {
-        setRandomTitle(); // Imposta il titolo casuale all'avvio
+        setRandomTitle(); 
 
         const urlParams = new URLSearchParams(window.location.search);
         const encodedList = urlParams.get('list');
@@ -327,9 +302,12 @@
         });
 
         if (encodedList) {
+            // Se c'è un link (modalità marito), non carichiamo la bozza
             showShoppingMode(encodedList);
         } else {
+            // Se siamo in selezione (modalità moglie), carichiamo i checkbox
             initSelectionMode();
+            loadDraft(); // <-- Carica i dati salvati
         }
     });
 
@@ -353,24 +331,75 @@
                 form.appendChild(label);
             });
         }
+    }
+
+    // --- NUOVE FUNZIONI PER SALVATAGGIO ---
+
+    function loadDraft() {
+        const savedData = localStorage.getItem(STORAGE_KEY);
+        if (!savedData) {
+            updateLinks(); // Aggiorna UI vuota
+            return;
+        }
+
+        try {
+            const savedItems = JSON.parse(savedData);
+            
+            // Per ogni elemento salvato
+            savedItems.forEach(val => {
+                // Cerca se esiste una checkbox standard con questo valore
+                const checkbox = document.querySelector(`input[name="item"][value="${val}"]`);
+                
+                if (checkbox) {
+                    // Se esiste (prodotto standard), la spuntiamo
+                    checkbox.checked = true;
+                } else {
+                    // Se non esiste, vuol dire che era un prodotto personalizzato
+                    // Lo ricreiamo rimuovendo l'emoji ✨ se presente per evitare doppi
+                    let cleanText = val.replace('✨ ', ''); 
+                    addCustomItem(cleanText, true); // true = è un restore
+                }
+            });
+            updateLinks(); // Aggiorna contatori
+        } catch (e) {
+            console.error("Errore nel caricamento lista", e);
+        }
+    }
+
+    function clearSelection() {
+        if(!confirm("Vuoi cancellare tutte le spunte selezionate?")) return;
+        
+        // Deseleziona tutto visivamente
+        document.querySelectorAll('input[name="item"]').forEach(el => el.checked = false);
+        // Rimuove i custom items visivamente
+        document.getElementById('custom-items-list').innerHTML = '';
+        
+        // Pulisce la memoria
+        localStorage.removeItem(STORAGE_KEY);
         updateLinks();
     }
 
-    // --- FUNZIONE AGGIUNTA MANUALE ---
-    function addCustomItem() {
+    // --- MODIFICATA PER GESTIRE PARAMETRI ---
+    function addCustomItem(textToRestore = null, isRestore = false) {
+        let value;
         const input = document.getElementById('custom-input');
-        const value = input.value.trim();
+
+        if (textToRestore) {
+            value = textToRestore;
+        } else {
+            value = input.value.trim();
+        }
         
         if (!value) return;
 
         const container = document.getElementById('custom-items-list');
         const label = document.createElement('label');
         
-        // Aggiungiamo un'emoji sparkle automatica per i custom items
-        const itemValue = "✨ " + value;
+        // Se stiamo ripristinando, il valore ha già l'emoji se lo prendiamo dal valore checkbox,
+        // ma qui textToRestore è pulito. Aggiungiamo sempre l'emoji se non c'è.
+        const itemValue = value.startsWith('✨') ? value : "✨ " + value;
 
         label.className = 'item-selector';
-        // Creiamo la checkbox già spuntata (checked)
         label.innerHTML = `
             <input type="checkbox" name="item" value="${itemValue}" checked onchange="updateLinks()">
             <div class="check-indicator"></div>
@@ -378,24 +407,28 @@
         `;
         
         container.appendChild(label);
-        input.value = ""; // Pulisci campo
         
-        // Scrolla leggermente per mostrare l'elemento aggiunto
-        label.scrollIntoView({behavior: "smooth", block: "center"});
-        
-        updateLinks(); // Aggiorna il link subito
+        if (!textToRestore) {
+            input.value = ""; // Pulisci campo solo se inserimento manuale
+            label.scrollIntoView({behavior: "smooth", block: "center"});
+            updateLinks(); // Aggiorna e salva
+        }
     }
 
     function updateLinks() {
         const checkboxes = document.querySelectorAll('input[name="item"]:checked');
         currentSelection = Array.from(checkboxes).map(cb => cb.value);
 
+        // --- SALVARE LO STATO ---
+        // Salviamo l'array currentSelection nel browser
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(currentSelection));
+        // ------------------------
+
         const count = currentSelection.length;
         document.getElementById('counter').textContent = 
             count === 0 ? "Scegli i prodotti..." : `${count} prodotti selezionati`;
 
         const baseUrl = window.location.href.split('?')[0];
-        // Encoding gestisce le emoji automaticamente nel link
         const listString = currentSelection.join('|');
         const encoded = encodeURIComponent(listString);
         const fullLink = `${baseUrl}?list=${encoded}`;
@@ -404,14 +437,20 @@
         const waLink = `https://wa.me/?text=${encodeURIComponent(waText)}`;
         
         const waBtn = document.getElementById('whatsapp-btn');
+        const copyBtn = document.querySelector('.btn-copy');
+
         if (count > 0) {
             waBtn.href = waLink;
             waBtn.style.opacity = "1";
             waBtn.style.pointerEvents = "auto";
+            copyBtn.style.opacity = "1";
+            copyBtn.style.pointerEvents = "auto";
         } else {
             waBtn.removeAttribute('href');
             waBtn.style.opacity = "0.5";
             waBtn.style.pointerEvents = "none";
+            copyBtn.style.opacity = "0.5";
+            copyBtn.style.pointerEvents = "none";
         }
 
         return fullLink;
@@ -446,7 +485,6 @@
         document.getElementById('selection-view').classList.add('hidden');
         document.getElementById('shopping-view').classList.remove('hidden');
         
-        // Titolo statico per chi fa la spesa, o personalizzato se preferisci
         document.getElementById('page-title').textContent = "Lista Spesa 🛒";
 
         const listString = decodeURIComponent(encodedList);
@@ -458,12 +496,10 @@
         items.forEach(item => {
             const div = document.createElement('div');
             div.className = 'shopping-item';
-            // L'item contiene già l'emoji, quindi la visualizziamo direttamente
             div.innerHTML = `<div class="circle"></div> <span class="item-text">${item}</span>`;
             
             div.onclick = function() {
                 this.classList.toggle('bought');
-                // Vibrazione leggera su mobile quando spunti (se supportato)
                 if (navigator.vibrate) navigator.vibrate(10);
             };
             listContainer.appendChild(div);
