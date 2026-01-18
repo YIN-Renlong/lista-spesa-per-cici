@@ -23,7 +23,7 @@
             text-align: center; 
             color: #2c3e50; 
             margin-bottom: 10px; 
-            font-size: 1.6rem; 
+            font-size: 1.5rem; 
             line-height: 1.4;
         }
         .container { max-width: 600px; margin: 0 auto; }
@@ -45,7 +45,7 @@
             display: flex;
             align-items: center;
             margin: 8px 0;
-            font-size: 18px;
+            font-size: 17px; /* Leggermente più piccolo per far stare il doppio testo */
             padding: 12px;
             background: #fff;
             border: 1px solid var(--border);
@@ -113,7 +113,7 @@
             color: #e74c3c;
             padding: 8px 16px;
             border-radius: 20px;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
         }
 
@@ -126,7 +126,7 @@
             background: white;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            font-size: 19px; /* Ancora più leggibile per la spesa */
+            font-size: 18px;
             cursor: pointer;
             border: 1px solid transparent;
         }
@@ -197,31 +197,31 @@
 </head>
 <body>
 
-<div id="toast">Link copiato!</div>
+<div id="toast">Copiato / Gekopieerd!</div>
 
 <div class="container">
-    <h1 id="page-title">Cosa serve oggi?</h1>
+    <h1 id="page-title">Cosa serve? / Wat hebben we nodig?</h1>
 
     <div id="selection-view">
         <div class="clear-btn-container">
-            <button class="btn-clear" onclick="clearSelection()">🗑 Svuota tutto</button>
+            <button class="btn-clear" onclick="clearSelection()">🗑 Svuota / Leegmaken</button>
         </div>
 
         <form id="items-form">
             </form>
 
-        <div class="category">Altro / Mancanti</div>
+        <div class="category">Altro / Overige</div>
         <div id="custom-items-list"></div> 
         <div class="add-item-container">
-            <input type="text" id="custom-input" placeholder="Scrivi qui cosa manca..." enterkeyhint="done">
+            <input type="text" id="custom-input" placeholder="Scrivi qui / Typ hier..." enterkeyhint="done">
             <button id="add-btn" onclick="addCustomItem()">＋</button>
         </div>
         
         <div style="height: 140px;"></div> 
         <div class="bottom-bar" id="actions-bar">
-            <div class="counter-text" id="counter">Nessun prodotto selezionato</div>
+            <div class="counter-text" id="counter">Nessun prodotto / Geen producten</div>
             <div class="action-buttons">
-                <button class="btn btn-copy" onclick="copyLink()">Copia Link 📋</button>
+                <button class="btn btn-copy" onclick="copyLink()">Link 📋</button>
                 <a id="whatsapp-btn" href="#" class="btn btn-whatsapp">WhatsApp 💚</a>
             </div>
         </div>
@@ -229,7 +229,7 @@
 
     <div id="shopping-view" class="hidden">
         <div id="shopping-list"></div>
-        <button class="btn btn-reset" onclick="window.location.href = window.location.pathname">Nuova Lista ✨</button>
+        <button class="btn btn-reset" onclick="window.location.href = window.location.pathname">Nuova Lista / Nieuwe Lijst ✨</button>
         <div style="height: 50px;"></div>
     </div>
 </div>
@@ -242,49 +242,96 @@
         const randomEmoji = ciciEmojis[Math.floor(Math.random() * ciciEmojis.length)];
         const titleElement = document.getElementById('page-title');
         if (!window.location.search.includes('list=')) {
-            titleElement.textContent = `Cosa serve oggi la Cici? ${randomEmoji}`;
+            titleElement.textContent = `Cosa serve alla Cici? / Wat moet Cici hebben? ${randomEmoji}`;
         }
     }
 
-    // --- 2. LISTA PRODOTTI ---
+    // --- 2. LISTA PRODOTTI (ITA / NL) ---
+    // Abbiamo aggiunto la traduzione olandese/fiamminga accanto all'italiano
     const products = {
-        "Verdura & Odori 🥦": [
-            "🧄 Aglio", "🥬 Carciofi", "🥕 Carote", "🥦 Cavolfiore/Broccolo", 
-            "🧅 Cipolle rosse", "🌱 Erba cipollina", "🍄 Funghi Shiitake", 
-            "🥗 Insalata", "🥔 Patate rosse bio", "🍅 Pomodorini", 
-            "🌿 Prezzemolo", "🌿 Timo", "🥒 Zucchine"
+        "Verdura 🥦 Groenten": [
+            "🧄 Aglio / Knoflook", 
+            "🥬 Carciofi / Artisjokken", 
+            "🥕 Carote / Wortelen", 
+            "🥦 Cavolfiore / Bloemkool", 
+            "🧅 Cipolle rosse / Rode uien", 
+            "🌱 Erba cipollina / Bieslook", 
+            "🍄 Funghi / Paddenstoelen", 
+            "🥗 Insalata / Sla", 
+            "🥔 Patate rosse / Aardappelen", 
+            "🍅 Pomodorini / Kerstomaatjes", 
+            "🌿 Prezzemolo / Peterselie", 
+            "🌿 Timo / Tijm", 
+            "🥒 Zucchine / Courgettes"
         ],
-        "Frutta 🍎": [
-            "🍊 Arance", "🍌 Banane", "🍊 Clementine", "🍎 Frutta mista", "🍋 Limoni bio"
+        "Frutta 🍎 Fruit": [
+            "🍊 Arance / Sinaasappels", 
+            "🍌 Banane / Bananen", 
+            "🍊 Clementine / Mandarijnen", 
+            "🍎 Frutta mista / Gemengd fruit", 
+            "🍋 Limoni bio / Citroenen"
         ],
-        "Freschi, Frigo & Pane 🧀": [
-            "🧈 Burro", "🧀 Formaggio Quark", "🥛 Latte bio", "🥖 Pane Fresco", 
-            "🧀 Parmigiano", "🥣 Ricotta", "🧀 Scamorza secca", "🥚 Uova bio", "🍦 Yogurt"
+        "Frigo & Pane 🧀 Koelkast & Brood": [
+            "🧈 Burro / Boter", 
+            "🧀 Formaggio Quark / Kwark", 
+            "🥛 Latte bio / Melk", 
+            "🥖 Pane Fresco / Vers brood", 
+            "🧀 Parmigiano / Parmezaanse kaas", 
+            "🥣 Ricotta / Ricotta", 
+            "🧀 Scamorza / Gerookte kaas", 
+            "🥚 Uova bio / Eieren", 
+            "🍦 Yogurt / Yoghurt"
         ],
-        "Macelleria & Pescheria 🍗": [
-            "🥩 Bistecca", "🥩 Girello", "🥩 Macinato", "🐟 Merluzzo", 
-            "🐟 Pesce fresco", "🐔 Petto di pollo", "🐚 Vongole"
+        "Carne & Pesce 🍗 Vlees & Vis": [
+            "🥩 Bistecca / Biefstuk", 
+            "🥩 Girello / Rosbief", 
+            "🥩 Macinato / Gehakt", 
+            "🐟 Merluzzo / Kabeljauw", 
+            "🐟 Pesce fresco / Verse vis", 
+            "🐔 Petto di pollo / Kipfilet", 
+            "🐚 Vongole / Venusschelpen"
         ],
-        "Pasta & Riso (Primi) 🍝": [
-            "🍝 Lasagne", "🍝 Pasta corta", "🍲 Pastina", "🍚 Riso", "🍝 Spaghetti", "🍜 Tagliatelle"
+        "Pasta & Riso 🍝 Pasta & Rijst": [
+            "🍝 Lasagne / Lasagne", 
+            "🍝 Pasta corta / Korte pasta", 
+            "🍲 Pastina / Vermicelli", 
+            "🍚 Riso / Rijst", 
+            "🍝 Spaghetti / Spaghetti", 
+            "🍜 Tagliatelle / Tagliatelle"
         ],
-        "Legumi & Frutta Secca 🥜": [
-            "🥜 Anacardi", "🌰 Castagne", "🫙 Ceci (vetro)", "🫘 Fagioli (vetro)", 
-            "🌰 Mandorle", "🌰 Noci", "🥜 Pistacchi", "🌻 Semi misti"
+        "Legumi & Noci 🥜 Peulvruchten": [
+            "🥜 Anacardi / Cashewnoten", 
+            "🌰 Castagne / Kastanjes", 
+            "🫙 Ceci / Kikkererwten", 
+            "🫘 Fagioli / Bonen", 
+            "🌰 Mandorle / Amandelen", 
+            "🌰 Noci / Walnoten", 
+            "🥜 Pistacchi / Pistachenoten", 
+            "🌻 Semi misti / Gemengde zaden"
         ],
-        "Dispensa & Condimenti 🥫": [
-            "🫒 Olio Bio", "🥫 Passata pomodoro", "⚫️ Pepe nero", "🧂 Sale Fino", "🧂 Sale Grosso", "🍷 Vino"
+        "Dispensa 🥫 Voorraadkast": [
+            "🫒 Olio Bio / Olie", 
+            "🥫 Passata / Tomatenpuree", 
+            "⚫️ Pepe nero / Zwarte peper", 
+            "🧂 Sale Fino / Fijn zout", 
+            "🧂 Sale Grosso / Grof zout", 
+            "🍷 Vino / Wijn"
         ],
-        "Dolci & Colazione 🍫": [
-            "🍪 Biscotti", "☕️ Caffè", "🍫 Cioccolata", "🍰 Dolce per te"
+        "Dolci 🍫 Zoetigheden": [
+            "🍪 Biscotti / Koekjes", 
+            "☕️ Caffè / Koffie", 
+            "🍫 Cioccolata / Chocolade", 
+            "🍰 Dolce per te / Iets lekkers"
         ],
-        "Casa 🧻": [
-            "🧻 Carta cucina", "🧻 Carta igienica", "🧼 Detersivi"
+        "Casa 🧻 Huis": [
+            "🧻 Carta cucina / Keukenrol", 
+            "🧻 Carta igienica / WC-papier", 
+            "🧼 Detersivi / Wasmiddel"
         ]
     };
 
     let currentSelection = [];
-    const STORAGE_KEY = "cici_shopping_draft_v1";
+    const STORAGE_KEY = "cici_shopping_draft_v2_nl"; // Chiave aggiornata
 
     document.addEventListener('DOMContentLoaded', () => {
         setRandomTitle(); 
@@ -356,7 +403,7 @@
     }
 
     function clearSelection() {
-        if(!confirm("Vuoi cancellare tutte le spunte selezionate?")) return;
+        if(!confirm("Vuoi cancellare tutto? / Wil je alles verwijderen?")) return;
         document.querySelectorAll('input[name="item"]').forEach(el => el.checked = false);
         document.getElementById('custom-items-list').innerHTML = '';
         localStorage.removeItem(STORAGE_KEY);
@@ -403,7 +450,7 @@
 
         const count = currentSelection.length;
         document.getElementById('counter').textContent = 
-            count === 0 ? "Scegli i prodotti..." : `${count} prodotti selezionati`;
+            count === 0 ? "Nessun prodotto / Geen producten" : `${count} selezionati / geselecteerd`;
 
         const baseUrl = window.location.href.split('?')[0];
         const listString = currentSelection.join('|');
@@ -439,7 +486,7 @@
 
         try {
             await navigator.clipboard.writeText(link);
-            showToast("Link copiato!");
+            showToast("Link copiato / Gekopieerd!");
         } catch (err) {
             const textArea = document.createElement("textarea");
             textArea.value = link;
@@ -447,7 +494,7 @@
             textArea.select();
             document.execCommand("copy");
             document.body.removeChild(textArea);
-            showToast("Link copiato!");
+            showToast("Link copiato / Gekopieerd!");
         }
     }
 
@@ -463,7 +510,7 @@
         document.getElementById('selection-view').classList.add('hidden');
         document.getElementById('shopping-view').classList.remove('hidden');
         
-        document.getElementById('page-title').textContent = "Lista Spesa dalla Cici 🛒😋";
+        document.getElementById('page-title').textContent = "Lista Spesa / Boodschappen 🛒😋";
 
         const listString = decodeURIComponent(encodedList);
         if(!listString) return;
@@ -527,7 +574,7 @@
         if (otherItems.length > 0) {
             const catHeader = document.createElement('div');
             catHeader.className = 'category';
-            catHeader.textContent = "Altro / Extra ✨";
+            catHeader.textContent = "Altro / Overige ✨";
             listContainer.appendChild(catHeader);
 
             otherItems.forEach(item => {
